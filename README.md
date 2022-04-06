@@ -24,9 +24,10 @@ Theoretical example: An employer has some potential candidates to hire and wants
 1. Machine Learning performance metrics: Precision, Recall, F-1 Score, AUC. Those four metrics are typical evaluation metrics for binary classification tasks. While a value of one for all four metrics is ideal, a typical minimum value of success is 0.8.
 
 2. Business metrics:
-   Number of inputs per user (employer): This metric measures the engagement of user, higher value would indicate better engagement.
 
-   Number of days of login per month: This metric measures the user retention, higher value would indicate better retention.
+   	Number of inputs per user (employer): This metric measures the engagement of user, higher value would indicate better engagement.
+
+   	Number of days of login per month: This metric measures the user retention, higher value would indicate better retention.
 
 
 
