@@ -21,9 +21,10 @@ This project creates an app that can predict employees' attrition for a company.
 Theoretical example: An employer has some potential candidates to hire and wants to decide which one to hire. The employer decides to make hiring decision based on their attritions. The employer could use the app and input features related to their attritions like Satisfaction level, Education, Salary, etc. Then the app will tell the employer how likely each one of them would leave the company, and the employer could come up with corresponding hiring strategies based on the information.
 
 ## Success Criteria
-1. Machine Learning performance metric: Precision, Recall, F-1 Score, AUC. Those four metrics are typical evaluation metrics for binary classification tasks. While a value of one for all four metrics is ideal, a typical minimum value of success is 0.8.
+1. Machine Learning performance metrics: Precision, Recall, F-1 Score, AUC. Those four metrics are typical evaluation metrics for binary classification tasks. While a value of one for all four metrics is ideal, a typical minimum value of success is 0.8.
 
-2. Number of inputs per user (employer): This metric measures the engagement of user, higher value would indicate better engagement.
+2. Business metrics:
+   Number of inputs per user (employer): This metric measures the engagement of user, higher value would indicate better engagement.
 
    Number of days of login per month: This metric measures the user retention, higher value would indicate better retention.
 
