@@ -8,7 +8,7 @@ import botocore
 import pandas as pd
 
 logging.config.fileConfig('config/logging/local.conf')
-logger = logging.getLogger('s3-demo')
+logger = logging.getLogger(__name__)
 
 
 def parse_s3(s3path: str) -> typing.Tuple[str, str]:
