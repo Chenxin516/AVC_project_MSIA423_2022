@@ -1,9 +1,9 @@
 import logging.config
 import sqlite3
 import traceback
-
 import sqlalchemy.exc
 from flask import Flask, render_template, request, redirect, url_for
+
 
 # For setting up the Flask-SQLAlchemy database session
 from src.add_songs import Tracks, TrackManager
