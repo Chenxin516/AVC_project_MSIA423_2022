@@ -74,7 +74,7 @@ def train_model(X_train, y_train, output_model_path="./models/random_forest.sav"
     Args:
         X_train(pd.Dataframe): x variables of train data
         y_train(pd.Series): y variables of test data
-        saved_model_path [str]: path to saved trained model
+        output_model_path(str): path to saved trained model
     Returns:
         final_rf(sklearn.RandomForestClassifier): trained random forest model
     """
@@ -103,7 +103,7 @@ def predict(final_rf, X_test):
        Returns:
            y_pred(np.ndarray): predicted values
     """
-    y_pred=final_rf.predict(X_test)
+    y_pred = final_rf.predict(X_test)
     logger.debug('Made predictions')
     return y_pred
 
@@ -119,8 +119,8 @@ def evaluation(y_test, y_pred):
     accuracy = metrics.accuracy_score(y_test, y_pred)
     confusion = metrics.confusion_matrix(y_test, y_pred)
     result = pd.DataFrame(confusion,
-                       index=['Actual negative', 'Actual positive'],
-                       columns=['Predicted negative', 'Predicted positive'])
+                          index=['Actual negative', 'Actual positive'],
+                          columns=['Predicted negative', 'Predicted positive'])
 
     print('Accuracy on test: %0.3f' % accuracy)
     print(result)

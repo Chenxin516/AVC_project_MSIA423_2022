@@ -1,41 +1,107 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
+<head style="margin:30px;">
+    <!-- Required meta tags -->
     <meta charset="UTF-8">
-    <link href="static/basic.css" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
+
 </head>
 
-<body>
+<body style="margin:30px;">
     <h3>
-         <a href = "{{ url_for('index') }}">Penny Lane Music Recommender</a>
+         <a href = "{{ url_for('index') }}">Employee-Attrition-Prediction</a>
     </h3>
+    <h4>
+        Please enter the Employee's information below to Attrition Prediction:
+    </h4>
 
-    <hr/>
-    <table>
-         <thead>
-            <tr>
-               <th>Title</th>
-               <th>Artist</th>
-               <th>Album</th>
-            </tr>
-         </thead>
 
-         <tbody>
-            {% for track in tracks %}
-               <tr>
-                   <td>{{ track.title }}</td>
-                   <td>{{ track.artist }}</td>
-                   <td>{{ track.album }}</td>
-               </tr>
-            {% endfor %}
-         </tbody>
-      </table>
       <form action="{{ url_for('add_entry') }}" method=post class=add-entry>
       <dl>
-        <input type=text size=15 name=title placeholder="Title">
-        <input type=text size=15 name=artist placeholder="Artist">
-        <input type=text size=15 name=album placeholder="Album">
-        <input type=submit value=Add>
+
+          <label for = "EmployeeNumber">1. Enter Employee number: </label>
+          <input type="number" id="EmployeeNumber" name="EmployeeNumber">
+        <br />
+
+        <br />
+          <label for = "EnvironmentSatisfaction">2. Employee's Environment Satisfaction: (enter a number between 1 to 4) </label>
+          <input type="number" id="EnvironmentSatisfaction" name="EnvironmentSatisfaction" min=1 max=4>
+        <br />
+
+        <br />
+          <label for="JobInvolvement">3. Employee's Job Involvement: (enter a number between 1 to 4)</label>
+          <input type="number" id="JobInvolvement" name="JobInvolvement" min=1 max=4>
+        <br />
+
+        <br />
+          <label for="JobLevel">4. Employee's Job Level: (enter a number between 1 to 5)</label>
+          <input type="number" id="JobLevel" name="JobLevel" min=1 max=5>
+        <br />
+
+
+        <br />
+          <label for="JobSatisfaction">5. Employee's Job Satisfaction Level: (enter a number between 1 to 4)</label>
+          <input type="number" id="JobSatisfaction" name="JobSatisfaction" min=1 max=4>
+        <br />
+
+
+        <br />
+          <label for="PerformanceRating">6. Employee's Performance Rating: (enter a number between 1 to 4)</label>
+          <input type="number" id="PerformanceRating" name="PerformanceRating" min=1 max=4>
+        <br />
+
+
+        <br />
+          <label for="RelationshipSatisfaction">7. Employee's Relationship Satisfaction Level: (enter a number between 1 to 4)</label>
+          <input type="number" id="RelationshipSatisfaction" name="RelationshipSatisfaction" min=1 max=4>
+        <br />
+
+        <br />
+          <label for="YearsSinceLastPromotion">8. Number of Years Since Employee's Last Promotion (enter an integer)</label>
+          <input type="number" id="YearsSinceLastPromotion" name="YearsSinceLastPromotion" >
+        <br />
+
+        <br />
+          <label for="WorkLifeBalance">9. Employee's Work-Life Balance: (enter a number between 1 to 4)</label>
+          <input type="number" id="WorkLifeBalance" name="WorkLifeBalance" min=1 max=4>
+        <br />
+
+
+        <br />
+          <label for="MaritalStatus">10. Employee's Marital Status: </label>
+          <select name="MaritalStatus" id="MaritalStatus">
+              {% for Marital in MaritalStatus %}
+              <option value="{{ Marital }}">{{ Marital }}</option>
+              {% endfor %}
+          </select>
+        <br />
+
+        <br />
+          <label for="Gender">11. Employee's Gender: </label>
+          <select name="Gender" id="Gender">
+              {% for Gen in Gender %}
+              <option value="{{ Gen }}">{{ Gen }}</option>
+              {% endfor %}
+          </select>
+        <br />
+
+        <br />
+          <label for="OverTime">12. Employee works overtime or not: </label>
+          <select name="OverTime" id="OverTime">
+              {% for ot in OverTime %}
+              <option value="{{ ot }}">{{ ot }}</option>
+              {% endfor %}
+          </select>
+        <br />
+
+        <br />
+
+        <input type=submit value="Save Applicant Information & Get Prediction!">
+
       </dl>
     </form>
 

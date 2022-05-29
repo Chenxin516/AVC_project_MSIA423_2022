@@ -1,0 +1,50 @@
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+      h1 {
+        text-align: center;
+        color: #424242;
+      }
+      p {
+      text-align: center;
+      font-weight: bold;
+      color: #424242;
+      }
+      div {text-align: center}
+      body {
+        background-color: #F2F2F2
+      }
+    </style>
+
+    <link href="static/basic.css" rel="stylesheet">
+
+    <title>Prediction Results</title>
+  </head>
+  <body>
+    <h1>Prediction Results for the Employee</h1>
+
+    <hr/>
+
+    <p>
+      Probability of Attrition: {{ prob }}%
+    </p>
+
+    <p>
+      Conclusion: {{ label }}
+    </p>
+    <img src="https://www.aihr.com/wp-content/uploads/Employee-Attrition.png" alt="Image" width="1130", height="600", align="justify"></img>
+    <br/>
+
+    <br/>
+    <div>
+      <a href="{{ url_for('index') }}" style = "text-align:center;">Return to the Main Page to Get More Predictions</a>
+    </div>
+    <br/>
+
+
+
+  </body>
+</html>

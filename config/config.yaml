@@ -1,0 +1,16 @@
+model:
+  acquire_data:
+    s3_paths: ['s3://2021-msia423-xu-congda/data/MRegularSeasonDetailedResults.csv', 's3://2021-msia423-xu-congda/data/MNCAATourneySeeds.csv', 's3://2021-msia423-xu-congda/data/MNCAATourneyDetailedResults.csv']
+    local_paths: ['data/MRegularSeasonDetailedResults.csv', 'data/MNCAATourneySeeds.csv', 'data/MNCAATourneyDetailedResults.csv']
+  load_data:
+    input_paths: ['data/MRegularSeasonDetailedResults.csv', 'data/MNCAATourneyDetailedResults.csv', 'data/MNCAATourneySeeds.csv']
+    output_paths: ['data/regular_avg.csv', 'data/tourney_result.csv', 'data/seeds.csv', 'data/tourney_delta.csv']
+  featurize:
+    columns: ['Score', 'FGM', 'FGA', 'FGM3', 'FGA3', 'FTM', 'FTA', 'OR', 'DR', 'Ast', 'TO', 'Stl', 'Blk', 'PF', 'FGP', 'FG3P', 'FTP', 'Seed']
+  get_target:
+    column: 'Win'
+  split_data:
+    ratio: 0.25
+    random_state: 12345
+  train_model:
+    kernel: 'poly'

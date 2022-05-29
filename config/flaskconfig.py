@@ -18,3 +18,10 @@ DB_DIALECT = 'mysql+pymysql'
 SQLALCHEMY_DATABASE_URI = os.environ.get('SQLALCHEMY_DATABASE_URI')
 if SQLALCHEMY_DATABASE_URI is None:
     SQLALCHEMY_DATABASE_URI = f'{DB_DIALECT}://{DB_USER}:{DB_PW}@{DB_HOST}:{DB_PORT}/{DATABASE}'
+
+
+# Categorical questions used in the app
+MaritalStatus = ['Divorced', 'Single', 'Married']
+Gender = ['Male', 'Female']
+OverTime = ['Yes', 'No']
+
