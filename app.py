@@ -122,7 +122,6 @@ def add_entry():
                 logger.error('Cannot add employee added to the database, check your database connection')
 
             df_new = df.append(user_input, ignore_index=True)
-            logger.debug('Now the company has s% employee', max(df_new['EmployeeNumber']))
             df_new.to_csv('data/raw/employee_results.csv')
             logger.info('New Employee added to the local file')
 

@@ -76,21 +76,23 @@ Theoretical example: An employer has some potential candidates to hire and wants
 │
 ├── app.py                            <- Flask wrapper for running the web app 
 ├── run.py                            <- Simplifies the execution of one or more of the src scripts  
+├── run.py                            <- Simplifies the execution of one or more of the src scripts  
 ├── requirements.txt                  <- Python package dependencies 
 ```
 
 ## Running the app 
+Note: For Windows operating system, you might need to add winpty before the Docker Bash command.
 
-### 1. Initialize the database 
-#### Build an image for S3 (for raw data):
+### 1. Download/upload the data 
+Build the Docker image for AWS_S3 (for raw data):
 
 ```bash
- docker build -t project -f dockerfiles/Dockerfile.run_s3 .    
+docker build -t project -f dockerfiles/Dockerfile.run_s3 .    
 ```
 
 Upload to s3
 ```bash
- docker run -e AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY project 
+docker run -e AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY project 
 ```
 Download from s3
 
@@ -98,15 +100,30 @@ Download from s3
 docker run --mount type=bind,source="$(pwd)/data/raw/",target=/app/data/raw/ -e AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY project --download
 ```
 
-#### Create the database 
-To create the database in the location configured in `config.py` run: 
+###2 Run model pipeline (process data + train & save model):
+Build the Docker image for running the entire pipeline
+```bash
+docker build -f dockerfiles/Dockerfile.pipeline -t project .
+```
+Run the model pipeline 
 
 ```bash
-docker run --mount type=bind,source="$(pwd)"/data,target=/app/data/ pennylanedb create_db  --engine_string=sqlite:///data/tracks.db
+docker run --mount type=bind,source="$(pwd)",target=/app/ project pipeline.sh
 ```
-The `--mount` argument allows the app to access your local `data/` folder and save the SQLite database there so it is available after the Docker container finishes.
 
-
+###3 Create the AWS_RDS database (upload processed data/add employee)
+To Build the Docker image for creating database and adding records in RDS
+```bash
+docker build -t project -f dockerfiles/Dockerfile.run_rds .
+```
+Create the database in RDS
+```bash
+docker run -it --env SQLALCHEMY_DATABASE_URI project create_db
+```
+Adding processed data
+```bash
+docker run -it --env SQLALCHEMY_DATABASE_URI project ingest
+```
 #### Adding songs 
 To add songs to the database:
 
@@ -115,27 +132,24 @@ docker run --mount type=bind,source="$(pwd)"/data,target=/app/data/ pennylanedb 
 ```
 
 #### Defining your engine string 
-A SQLAlchemy database connection is defined by a string with the following format:
-
-`dialect+driver://username:password@host:port/database`
-
-The `+dialect` is optional and if not provided, a default is used. For a more detailed description of what `dialect` and `driver` are and how a connection is made, you can see the documentation [here](https://docs.sqlalchemy.org/en/13/core/engines.html). We will cover SQLAlchemy and connection strings in the SQLAlchemy lab session on 
-##### Local SQLite database 
-
-A local SQLite database can be created for development and local testing. It does not require a username or password and replaces the host and port with the path to the database file: 
-
+A SQLAlchemy database connection is defeind by `config/flaskconfig.py` . It includes the following configurations:
 ```python
-engine_string='sqlite:///data/tracks.db'
+# Engine string
+import os
+DB_HOST = os.environ.get('MYSQL_HOST')
+DB_PORT = os.environ.get('MYSQL_PORT')
+DB_USER = os.environ.get('MYSQL_USER')
+DB_PW = os.environ.get('MYSQL_PASSWORD')
+DATABASE = os.environ.get('MYSQL_DATABASE')
+DB_DIALECT = 'mysql+pymysql'
+SQLALCHEMY_DATABASE_URI = os.environ.get('SQLALCHEMY_DATABASE_URI')
+if SQLALCHEMY_DATABASE_URI is None:
+    SQLALCHEMY_DATABASE_URI = f'{DB_DIALECT}://{DB_USER}:{DB_PW}@{DB_HOST}:{DB_PORT}/{DATABASE}'
+
 
 ```
+The user will need his or her AWS credentials to access S3 or RDS.
 
-The three `///` denote that it is a relative path to where the code is being run (which is from the root of this directory).
-
-You can also define the absolute path with four `////`, for example:
-
-```python
-engine_string = 'sqlite://///Users/cmawer/Repos/2022-msia423-template-repository/data/tracks.db'
-```
 
 
 ### 2. Configure Flask app 
@@ -143,16 +157,16 @@ engine_string = 'sqlite://///Users/cmawer/Repos/2022-msia423-template-repository
 `config/flaskconfig.py` holds the configurations for the Flask app. It includes the following configurations:
 
 ```python
-DEBUG = True  # Keep True for debugging, change to False when moving to production 
-LOGGING_CONFIG = "config/logging/local.conf"  # Path to file that configures Python logger
-HOST = "0.0.0.0" # the host that is running the app. 0.0.0.0 when running locally 
-PORT = 5000  # What port to expose app on. Must be the same as the port exposed in dockerfiles/Dockerfile.app 
-SQLALCHEMY_DATABASE_URI = 'sqlite:///data/tracks.db'  # URI (engine string) for database that contains tracks
-APP_NAME = "penny-lane"
-SQLALCHEMY_TRACK_MODIFICATIONS = True 
+DEBUG = True
+LOGGING_CONFIG = "config/logging/local.conf"
+PORT = 5000
+APP_NAME = "Employee-Attrition-Prediction"
+SQLALCHEMY_TRACK_MODIFICATIONS = True
+HOST = "0.0.0.0"
 SQLALCHEMY_ECHO = False  # If true, SQL for queries made will be printed
-MAX_ROWS_SHOW = 100 # Limits the number of rows returned from the database 
+MAX_ROWS_SHOW = 100
 ```
+
 
 ### 3. Run the Flask app 
 
@@ -171,7 +185,8 @@ This command builds the Docker image, with the tag `pennylaneapp`, based on the 
 To run the Flask app, run: 
 
 ```bash
- docker run --name test-app --mount type=bind,source="$(pwd)"/data,target=/app/data/ -p 5000:5000 pennylaneapp
+docker run --name test-app --mount type=bind,source="$(pwd)",target=/app/ -p 5000:5000 project
+
 ```
 You should be able to access the app at http://127.0.0.1:5000/ in your browser (Mac/Linux should also be able to access the app at http://127.0.0.1:5000/ or localhost:5000/) .
 
@@ -186,10 +201,12 @@ Note: If `PORT` in `config/flaskconfig.py` is changed, this port should be chang
 
 #### Kill the container 
 
-Once finished with the app, you will need to kill the container. If you named the container, you can execute the following: 
+Once finished with the app, you will need to kill the container. 
+
+First run "ctrl"+"\" and "ctrl"+"Z" to stop the process. If you named the container, you can execute the following: 
 
 ```bash
-docker kill test-app 
+docker kill test-app
 ```
 where `test-app` is the name given in the `docker run` command.
 
@@ -201,7 +218,7 @@ docker container ls
 
 The name will be provided in the right most column. 
 
-## Testing
+## 4 Testing
 
 Run the following:
 

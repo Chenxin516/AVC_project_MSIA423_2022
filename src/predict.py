@@ -62,9 +62,7 @@ def prediction(input_df, model_path='models/rf.joblib'):
     except OSError:
         logger.error('Model is not found from %s', model_path)
     # predict probability of attrition
-    logger.info(loaded_rf)
     input_df = input_df.drop(columns=['EmployeeNumber'])
-    logger.debug('df for model: %s', input_df.columns)
 
     pred_prob = np.round(loaded_rf.predict_proba(input_df)[0][1], 2)
 
