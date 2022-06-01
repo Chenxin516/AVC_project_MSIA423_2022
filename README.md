@@ -82,13 +82,22 @@ Theoretical example: An employer has some potential candidates to hire and wants
 ## Running the app 
 
 ### 1. Initialize the database 
-#### Build the image 
-
-To build the image, run from this directory (the root of the repo): 
+#### Build an image for S3 (for raw data):
 
 ```bash
- docker build -f dockerfiles/Dockerfile.run -t pennylanedb .
+ docker build -t project -f dockerfiles/Dockerfile.run_s3 .    
 ```
+
+Upload to s3
+```bash
+ docker run -e AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY project 
+```
+Download from s3
+
+```bash
+docker run --mount type=bind,source="$(pwd)/data/raw/",target=/app/data/raw/ -e AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY project --download
+```
+
 #### Create the database 
 To create the database in the location configured in `config.py` run: 
 

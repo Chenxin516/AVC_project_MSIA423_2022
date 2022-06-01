@@ -1,16 +1,25 @@
 model:
-  acquire_data:
-    s3_paths: ['s3://2021-msia423-xu-congda/data/MRegularSeasonDetailedResults.csv', 's3://2021-msia423-xu-congda/data/MNCAATourneySeeds.csv', 's3://2021-msia423-xu-congda/data/MNCAATourneyDetailedResults.csv']
-    local_paths: ['data/MRegularSeasonDetailedResults.csv', 'data/MNCAATourneySeeds.csv', 'data/MNCAATourneyDetailedResults.csv']
-  load_data:
-    input_paths: ['data/MRegularSeasonDetailedResults.csv', 'data/MNCAATourneyDetailedResults.csv', 'data/MNCAATourneySeeds.csv']
-    output_paths: ['data/regular_avg.csv', 'data/tourney_result.csv', 'data/seeds.csv', 'data/tourney_delta.csv']
-  featurize:
-    columns: ['Score', 'FGM', 'FGA', 'FGM3', 'FGA3', 'FTM', 'FTA', 'OR', 'DR', 'Ast', 'TO', 'Stl', 'Blk', 'PF', 'FGP', 'FG3P', 'FTP', 'Seed']
-  get_target:
-    column: 'Win'
+  get_data:
+    file: 'data/raw/employee_attrition_train.csv'
+  clean_data:
+    missing_col: ['Age', 'DailyRate', 'DistanceFromHome']
+    columns: ['EnvironmentSatisfaction', 'Attrition', 'Gender', 'JobInvolvement', 'JobLevel', 'JobSatisfaction',
+               'MaritalStatus',
+               'OverTime', 'PerformanceRating', 'RelationshipSatisfaction', 'WorkLifeBalance',
+               'YearsSinceLastPromotion']
   split_data:
-    ratio: 0.25
-    random_state: 12345
+    test_size: 0.2
+    random_state: 101
   train_model:
-    kernel: 'poly'
+    max_depth: 50
+    n_estimators: 200
+
+rds: "data/raw/employee_results.csv"
+
+s3: 's3://2022-msia423-yang-chenxin/raw_data/employee_train.csv'
+
+local: 'data/raw/employee_attrition_train.csv'
+
+
+
+

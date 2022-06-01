@@ -5,6 +5,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from src.employee_db import create_db, EmployeeManager, Employee
 from sqlalchemy.exc import ProgrammingError, OperationalError
 import argparse
+import yaml
 
 engine_string = os.getenv("SQLALCHEMY_DATABASE_URI")
 if engine_string is None:
@@ -19,6 +20,11 @@ Base = declarative_base()
 
 if __name__ == "__main__":
 
+    with open('config/config.yaml', "r") as f:
+        config = yaml.load(f, Loader=yaml.FullLoader)
+
+    logger.info('Configuration file loaded')
+
     # Add parsers for both creating a database and adding model result data to it
     parser = argparse.ArgumentParser(description="Create and/or add data to database")
     subparsers = parser.add_subparsers(dest='subparser_name')
@@ -30,7 +36,7 @@ if __name__ == "__main__":
 
     # Sub-parser for ingesting new data
     sp_ingest = subparsers.add_parser("ingest", description="Add result data to database")
-    sp_ingest.add_argument("--input_path", default="data/raw/employee_attrition_result.csv",
+    sp_ingest.add_argument("--input_path", default=config['rds'],
                            help="input file path")
     sp_ingest.add_argument("--engine_string", default=engine_string,
                            help="SQLAlchemy connection URI for database")

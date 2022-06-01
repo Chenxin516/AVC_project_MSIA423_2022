@@ -1,0 +1,6 @@
+python run_model.py get  --output 'data/model/employee.csv'
+python run_model.py clean --input 'data/model/employee.csv' --output 'data/model/clean.csv'
+python run_model.py split --input 'data/model/clean.csv' --output 'data/model/X_train.csv' 'data/model/X_test.csv' 'data/model/y_train.pkl' 'data/model/y_test.pkl'
+python run_model.py train --input 'data/model/X_train.csv' 'data/model/y_train.pkl' --output 'models/rf.joblib'
+python run_model.py score --input 'models/rf.joblib' 'data/model/X_test.csv' --output 'data/model/ypred_prob_test.npy' 'data/model/ypred_bin_test.npy'
+python run_model.py evaluate --input 'data/model/y_test.pkl' 'data/model/ypred_prob_test.npy' 'data/model/ypred_bin_test.npy' --output 'data/model/evaluation_results.csv'

@@ -1,13 +1,12 @@
 import logging.config
-import sqlite3
 import traceback
-import sqlalchemy.exc
 import yaml
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request
 from config.flaskconfig import MaritalStatus, Gender, OverTime
+import pandas as pd
 
 # For setting up the Flask-SQLAlchemy database session
-from src.employee_db import Employee, EmployeeManager
+from src.employee_db import EmployeeManager
 from src.predict import transform_input, prediction
 
 # Initialize the Flask application
@@ -64,53 +63,71 @@ def add_entry():
     if request.method == 'GET':
         return "Visit the homepage to add applicants and get predictions"
     elif request.method == 'POST':
+        df = pd.read_csv('data/raw/employee_results.csv')
+        number = max(df['EmployeeNumber']) + 1
         try:
-            # Add new applicant information to RDS for future usages
-            employee_manager.add_employee(
-                EmployeeNumber=int(request.form['EmployeeNumber']),
-                EnvironmentSatisfaction=int(request.form['EnvironmentSatisfaction']),
-                JobInvolvement=int(request.form['JobInvolvement']),
-                JobLevel=int(request.form['JobLevel']),
-                JobSatisfaction=int(request.form['JobSatisfaction']),
-                PerformanceRating=request.form['PerformanceRating'],
-                RelationshipSatisfaction=request.form['RelationshipSatisfaction'],
-                YearsSinceLastPromotion=request.form['YearsSinceLastPromotion'],
-                WorkLifeBalance=request.form['WorkLifeBalance'],
-                MaritalStatus=request.form['MaritalStatus'],
-                Gender=request.form['Gender'],
-                OverTime=request.form['OverTime']
-            )
-
             logger.info(
                 "New applicant of Employee ID %s added",
-                request.form['EmployeeNumber']
+                number
             )
 
             # Get loan delinquency prediction for the new applicant
-            user_input = {'EmployeeNumber': request.form['EmployeeNumber'],
-                          'EnvironmentSatisfaction': request.form['EnvironmentSatisfaction'],
-                          'JobInvolvement': request.form['JobInvolvement'],
-                          'JobLevel': request.form['JobLevel'],
-                          'JobSatisfaction': request.form['JobSatisfaction'],
-                          'PerformanceRating': request.form['PerformanceRating'],
-                          'RelationshipSatisfaction': request.form['RelationshipSatisfaction'],
-                          'YearsSinceLastPromotion': request.form['YearsSinceLastPromotion'],
-                          'WorkLifeBalance': request.form['WorkLifeBalance'],
+            user_input = {'EmployeeNumber': number,
+                          'EnvironmentSatisfaction': int(request.form['EnvironmentSatisfaction']),
+                          'JobInvolvement': int(request.form['JobInvolvement']),
+                          'JobLevel': int(request.form['JobLevel']),
+                          'JobSatisfaction': int(request.form['JobSatisfaction']),
+                          'PerformanceRating': int(request.form['PerformanceRating']),
+                          'RelationshipSatisfaction': int(request.form['RelationshipSatisfaction']),
+                          'WorkLifeBalance': int(request.form['WorkLifeBalance']),
+                          'YearsSinceLastPromotion': int(request.form['YearsSinceLastPromotion']),
                           'MaritalStatus': request.form['MaritalStatus'],
                           'Gender': request.form['Gender'],
                           'OverTime': request.form['OverTime']}
 
+            # get transformed input and prediction
             user_input_new = transform_input(user_input)
             label = prediction(user_input_new)[0]
             prob = prediction(user_input_new)[1]
 
             logger.info(
-                "The employee's probability of attrition is: %f percent, "
+                "The employee's probability of attrition is: %f, "
                 "hence %s", prob, label
             )
 
+            if label == "the employee is not likely to leave":
+                attr = 'No'
+            else:
+                attr = 'Yes'
+
+            try:
+                # Add new applicant information to RDS for future usages
+                employee_manager.add_employee(
+                    EmployeeNumber=number,
+                    EnvironmentSatisfaction=int(request.form['EnvironmentSatisfaction']),
+                    JobInvolvement=int(request.form['JobInvolvement']),
+                    JobLevel=int(request.form['JobLevel']),
+                    JobSatisfaction=int(request.form['JobSatisfaction']),
+                    PerformanceRating=int(request.form['PerformanceRating']),
+                    RelationshipSatisfaction=int(request.form['RelationshipSatisfaction']),
+                    WorkLifeBalance=int(request.form['WorkLifeBalance']),
+                    YearsSinceLastPromotion=int(request.form['YearsSinceLastPromotion']),
+                    MaritalStatus=request.form['MaritalStatus'],
+                    Gender=request.form['Gender'],
+                    OverTime=request.form['OverTime'],
+                    Attrition=attr
+                )
+                logger.info('New Employee added to the database')
+            except:
+                logger.error('Cannot add employee added to the database, check your database connection')
+
+            df_new = df.append(user_input, ignore_index=True)
+            logger.debug('Now the company has s% employee', max(df_new['EmployeeNumber']))
+            df_new.to_csv('data/raw/employee_results.csv')
+            logger.info('New Employee added to the local file')
+
             logger.debug("Result page accessed")
-            return render_template('result.html', user_prob=prob, user_bin=label)
+            return render_template('result.html', prob=prob, label=label)
         except:
             logger.warning("Not able to process your request, error page returned")
             return render_template('error.html')
@@ -118,7 +135,7 @@ def add_entry():
 
 @app.route('/about', methods=['GET'])
 def about():
-    """View of an 'About' page that has detailed information about the project
+    """'About' page with information about the project and creater
     Returns:
         rendered html template located at: app/templates/about.html
     """

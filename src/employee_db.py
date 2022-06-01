@@ -37,6 +37,7 @@ class Employee(Base):
     MaritalStatus = sqlalchemy.Column(sqlalchemy.String(100), unique=False, nullable=True)
     Gender = sqlalchemy.Column(sqlalchemy.String(100), unique=False, nullable=True)
     OverTime = sqlalchemy.Column(sqlalchemy.String(100), unique=False, nullable=True)
+    Attrition = sqlalchemy.Column(sqlalchemy.String(100), unique=False, nullable=True)
 
     def __repr__(self):
         return '<Employee %d>' % self.EmployeeNumber
@@ -139,7 +140,8 @@ class EmployeeManager:
                      WorkLifeBalance: int,
                      MaritalStatus: str,
                      Gender: str,
-                     OverTime: str) -> None:
+                     OverTime: str,
+                     Attrition: str) -> None:
         """Seeds an existing database with a new employee.
         Args:
             arguments with respect to employee (self-explanatory by names)
@@ -147,12 +149,15 @@ class EmployeeManager:
             None
         """
 
+        logger.debug("trying to add employee with employee number %s", EmployeeNumber)
+
         session = self.session
+        logger.debug("session initialized")
         employee = Employee(EmployeeNumber=EmployeeNumber, EnvironmentSatisfaction=EnvironmentSatisfaction,
                             JobInvolvement=JobInvolvement, JobLevel=JobLevel, JobSatisfaction=JobSatisfaction,
                             PerformanceRating=PerformanceRating, RelationshipSatisfaction=RelationshipSatisfaction,
                             YearsSinceLastPromotion=YearsSinceLastPromotion, WorkLifeBalance=WorkLifeBalance,
-                            MaritalStatus=MaritalStatus, Gender=Gender, OverTime=OverTime)
+                            MaritalStatus=MaritalStatus, Gender=Gender, OverTime=OverTime, Attrition=Attrition)
         session.add(employee)
         session.commit()
         logger.info("new employee added")

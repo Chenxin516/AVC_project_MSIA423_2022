@@ -19,14 +19,32 @@ def transform_input(ui_dict):
     input_df = pd.DataFrame(ui_dict, index=[0])
     logger.debug('Initial Input column names: %s', input_df.columns)
 
-    # change column names to match the one-hot-encoded column names
+    # change columns to match the dummy column names
+    if input_df['Gender'][0] == 'Male':
+        input_df['Gender_Male'] = 1
 
-    df_new = pd.get_dummies(input_df, drop_first=True)
+    if input_df['MaritalStatus'][0] == 'Married':
+        input_df['MaritalStatus_Married'] = 1
+        input_df['MaritalStatus_Single'] = 0
+
+    if input_df['MaritalStatus'][0] == 'Single':
+        input_df['MaritalStatus_Married'] = 0
+        input_df['MaritalStatus_Single'] = 1
+
+    if input_df['MaritalStatus'][0] == 'Divorced':
+        input_df['MaritalStatus_Married'] = 0
+        input_df['MaritalStatus_Single'] = 0
+
+    if input_df['OverTime'][0] == 'Yes':
+        input_df['OverTime_Yes'] = 1
+
+    df_new = input_df.drop(columns=['Gender', 'MaritalStatus', 'OverTime'])
+
     logger.debug('Column names after all transformation steps: %s', df_new.columns)
     return df_new
 
 
-def prediction(input_df, model_path):
+def prediction(input_df, model_path='models/rf.joblib'):
     """Get loan delinquency prediction for new user input
     Args:
         input_df (:obj:`DataFrame <pandas.DataFrame>`): a DataFrame of the transformed user input
@@ -44,6 +62,9 @@ def prediction(input_df, model_path):
     except OSError:
         logger.error('Model is not found from %s', model_path)
     # predict probability of attrition
+    logger.info(loaded_rf)
+    input_df = input_df.drop(columns=['EmployeeNumber'])
+    logger.debug('df for model: %s', input_df.columns)
 
     pred_prob = np.round(loaded_rf.predict_proba(input_df)[0][1], 2)
 
