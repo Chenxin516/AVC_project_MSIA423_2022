@@ -7,7 +7,7 @@ import numpy as np
 logger = logging.getLogger(__name__)
 
 
-def transform_input(ui_dict):
+def transform_input(ui_dict: dict) -> pd.DataFrame:
     """Transform the user input from the app to get predictions using the trained model
     Args:
         ui_dict (dict): a dictionary of user input, collected from the app
@@ -44,7 +44,7 @@ def transform_input(ui_dict):
     return df_new
 
 
-def prediction(input_df, model_path='models/rf.joblib'):
+def prediction(input_df: pd.DataFrame, model_path='models/rf.joblib') -> [np.array, np.array]:
     """Get loan delinquency prediction for new user input
     Args:
         input_df (:obj:`DataFrame <pandas.DataFrame>`): a DataFrame of the transformed user input

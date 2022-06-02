@@ -23,12 +23,15 @@ def get_data(file: str) -> pd.DataFrame:
     return df
 
 
-def clean_data(data: pd.DataFrame, missing_col: List[str], columns: List[str]) -> pd.DataFrame:
+def clean_data(data: pd.DataFrame, missing_col: List[str], columns: List[str], output_path='./data/raw'
+                                                                                           '/employee_results.csv') \
+        -> pd.DataFrame:
     """Clean_date.
     Args:
         data (pd.DataFrame):raw dataframe downloaded
         missing_col (list(str)): missing columns
         columns (list(str)): columns to be selected
+        output_path (str): output path to save processed data
     Returns:
         df_model (dataframe): cleaned dataframe ready for modeling
     """
@@ -41,7 +44,10 @@ def clean_data(data: pd.DataFrame, missing_col: List[str], columns: List[str]) -
     data.dropna(axis=0, inplace=True)
     df = data[columns]
     df['EmployeeNumber'] = data['EmployeeNumber']
-    df.to_csv('./data/raw/employee_results.csv', index=False)
+    if output_path == '':
+        pass
+    else:
+        df.to_csv(output_path, index=False)
 
     df = df.drop(columns=['EmployeeNumber'])
     # convert target variables to 1 and 0

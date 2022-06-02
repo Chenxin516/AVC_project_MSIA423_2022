@@ -124,12 +124,7 @@ Adding processed data
 ```bash
 docker run -it --env SQLALCHEMY_DATABASE_URI project ingest
 ```
-#### Adding songs 
-To add songs to the database:
 
-```bash
-docker run --mount type=bind,source="$(pwd)"/data,target=/app/data/ pennylanedb ingest --engine_string=sqlite:///data/tracks.db --artist=Emancipator --title="Minor Cause" --album="Dusk to Dawn"
-```
 
 #### Defining your engine string 
 A SQLAlchemy database connection is defeind by `config/flaskconfig.py` . It includes the following configurations:
@@ -186,9 +181,9 @@ To run the Flask app, run:
 
 ```bash
 docker run --name test-app --mount type=bind,source="$(pwd)",target=/app/ -p 5000:5000 project
-
 ```
 You should be able to access the app at http://127.0.0.1:5000/ in your browser (Mac/Linux should also be able to access the app at http://127.0.0.1:5000/ or localhost:5000/) .
+To read the about page, you can go to  http://127.0.0.1:5000/about to read the introduction.
 
 The arguments in the above command do the following: 
 
@@ -220,69 +215,22 @@ The name will be provided in the right most column.
 
 ## 4 Testing
 
-Run the following:
+Run the following to build the docker image for testing:
 
 ```bash
- docker build -f dockerfiles/Dockerfile.test -t pennylanetest .
+ docker build -f dockerfiles/Dockerfile.test -t project .
 ```
 
 To run the tests, run: 
 
 ```bash
- docker run pennylanetest
+ docker run project
 ```
 
 The following command will be executed within the container to run the provided unit tests under `test/`:  
 
 ```bash
 python -m pytest
-``` 
-
-## Mypy
-
-Run the following:
-
-```bash
- docker build -f dockerfiles/Dockerfile.mypy -t pennymypy .
 ```
 
-To run mypy over all files in the repo, run: 
-
-```bash
- docker run pennymypy .
-```
-To allow for quick iteration, mount your entire repo so changes in Python files are detected:
-
-
-```bash
- docker run --mount type=bind,source="$(pwd)"/,target=/app/ pennymypy .
-```
-
-To run mypy for a single file, run: 
-
-```bash
- docker run pennymypy run.py
-```
-
-## Pylint
-
-Run the following:
-
-```bash
- docker build -f dockerfiles/Dockerfile.pylint -t pennylint .
-```
-
-To run pylint for a file, run:
-
-```bash
- docker run pennylint run.py 
-```
-
-(or any other file name, with its path relative to where you are executing the command from)
-
-To allow for quick iteration, mount your entire repo so changes in Python files are detected:
-
-
-```bash
- docker run --mount type=bind,source="$(pwd)"/,target=/app/ pennylint run.py
-```
+Warnings in the interface are safe to be ignored as long as all four tests are paased.

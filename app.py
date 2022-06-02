@@ -118,11 +118,14 @@ def add_entry():
                     Attrition=attr
                 )
                 logger.info('New Employee added to the database')
-            except:
+            except ConnectionError:
                 logger.error('Cannot add employee added to the database, check your database connection')
+            except:
+                logger.error('Cannot add employee added to the database, the employee might already exist in the '
+                             'database')
 
             df_new = df.append(user_input, ignore_index=True)
-            df_new.to_csv('data/raw/employee_results.csv')
+            df_new.to_csv('data/raw/employee_results.csv', index=False)
             logger.info('New Employee added to the local file')
 
             logger.debug("Result page accessed")

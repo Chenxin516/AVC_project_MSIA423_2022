@@ -16,7 +16,7 @@
          <a href = "{{ url_for('index') }}">Employee-Attrition-Prediction</a>
     </h3>
     <h4>
-        Please enter the Employee's information below to Attrition Prediction:
+        Please enter the Employee's information below to Predict Attrition:
     </h4>
 
 
@@ -28,51 +28,51 @@
 <!--        <br />-->
 
         <br />
-          <label for = "EnvironmentSatisfaction">2. Employee's Environment Satisfaction: (enter a number between 1 to 4) </label>
+          <label for = "EnvironmentSatisfaction">1. Employee's Environment Satisfaction: (enter a number between 1 to 4) </label>
           <input type="number" id="EnvironmentSatisfaction" name="EnvironmentSatisfaction" min=1 max=4>
         <br />
 
         <br />
-          <label for="JobInvolvement">3. Employee's Job Involvement: (enter a number between 1 to 4)</label>
+          <label for="JobInvolvement">2. Employee's Job Involvement: (enter a number between 1 to 4)</label>
           <input type="number" id="JobInvolvement" name="JobInvolvement" min=1 max=4>
         <br />
 
         <br />
-          <label for="JobLevel">4. Employee's Job Level: (enter a number between 1 to 5)</label>
+          <label for="JobLevel">3. Employee's Job Level: (enter a number between 1 to 5)</label>
           <input type="number" id="JobLevel" name="JobLevel" min=1 max=5>
         <br />
 
 
         <br />
-          <label for="JobSatisfaction">5. Employee's Job Satisfaction Level: (enter a number between 1 to 4)</label>
+          <label for="JobSatisfaction">4. Employee's Job Satisfaction Level: (enter a number between 1 to 4)</label>
           <input type="number" id="JobSatisfaction" name="JobSatisfaction" min=1 max=4>
         <br />
 
 
         <br />
-          <label for="PerformanceRating">6. Employee's Performance Rating: (enter a number between 1 to 4)</label>
+          <label for="PerformanceRating">5. Employee's Performance Rating: (enter a number between 1 to 4)</label>
           <input type="number" id="PerformanceRating" name="PerformanceRating" min=1 max=4>
         <br />
 
 
         <br />
-          <label for="RelationshipSatisfaction">7. Employee's Relationship Satisfaction Level: (enter a number between 1 to 4)</label>
+          <label for="RelationshipSatisfaction">6. Employee's Relationship Satisfaction Level: (enter a number between 1 to 4)</label>
           <input type="number" id="RelationshipSatisfaction" name="RelationshipSatisfaction" min=1 max=4>
         <br />
 
         <br />
-          <label for="YearsSinceLastPromotion">8. Number of Years Since Employee's Last Promotion (enter an integer)</label>
+          <label for="YearsSinceLastPromotion">7. Number of Years Since Employee's Last Promotion (enter an integer)</label>
           <input type="number" id="YearsSinceLastPromotion" name="YearsSinceLastPromotion" >
         <br />
 
         <br />
-          <label for="WorkLifeBalance">9. Employee's Work-Life Balance: (enter a number between 1 to 4)</label>
+          <label for="WorkLifeBalance">8. Employee's Work-Life Balance: (enter a number between 1 to 4)</label>
           <input type="number" id="WorkLifeBalance" name="WorkLifeBalance" min=1 max=4>
         <br />
 
 
         <br />
-          <label for="MaritalStatus">10. Employee's Marital Status: </label>
+          <label for="MaritalStatus">9. Employee's Marital Status: </label>
           <select name="MaritalStatus" id="MaritalStatus">
               {% for Marital in MaritalStatus %}
               <option value="{{ Marital }}">{{ Marital }}</option>
@@ -81,7 +81,7 @@
         <br />
 
         <br />
-          <label for="Gender">11. Employee's Gender: </label>
+          <label for="Gender">10. Employee's Gender: </label>
           <select name="Gender" id="Gender">
               {% for Gen in Gender %}
               <option value="{{ Gen }}">{{ Gen }}</option>
@@ -90,7 +90,7 @@
         <br />
 
         <br />
-          <label for="OverTime">12. Employee works overtime or not: </label>
+          <label for="OverTime">11. Employee works overtime or not: </label>
           <select name="OverTime" id="OverTime">
               {% for ot in OverTime %}
               <option value="{{ ot }}">{{ ot }}</option>
