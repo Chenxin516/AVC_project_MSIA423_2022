@@ -100,7 +100,7 @@ class EmployeeManager:
         else:
             raise ValueError("Need either an engine string or a Flask app to initialize")
 
-    def add_result(self, input_path: str):
+    def add_result(self, input_path: str) -> None:
         """
         Create the result table in RDS
         Args:

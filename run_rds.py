@@ -7,6 +7,7 @@ from sqlalchemy.exc import ProgrammingError, OperationalError
 import argparse
 import yaml
 
+#define engine string
 engine_string = os.getenv("SQLALCHEMY_DATABASE_URI")
 if engine_string is None:
     raise RuntimeError("SQLALCHEMY_DATABASE_URI environment variable not set; exiting")

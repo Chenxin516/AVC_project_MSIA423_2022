@@ -1,16 +1,7 @@
 # MSiA423 Employee Attrition Prediction Poroject
 
-# Table of Contents
-* [Directory structure ](#Directory-structure)
-* [Running the app ](#Running-the-app)
-	* [1. Initialize the database ](#1.-Initialize-the-database)
-	* [2. Configure Flask app ](#2.-Configure-Flask-app)
-	* [3. Run the Flask app ](#3.-Run-the-Flask-app)
-* [Testing](#Testing)
-* [Mypy](#Mypy)
-* [Pylint](#Pylint)
 
-# Project charter
+# Chenxin Yang
 
 ## Vision
 Every year a lot of companies invest time and money in training both new and existing employees. Those companies aim to increase the effectiveness of their employees. However, every year many employees leave the companies because of various reasons like voluntary resignations, layoffs, illness, etc. It would be a waste of time and money if companies spend effort to hire and train those employees who would later leave the companies. Therefore, it would be important if companies can predict employee attrition in order to better allocate their resources.
@@ -43,40 +34,39 @@ Theoretical example: An employer has some potential candidates to hire and wants
 ├── config                            <- Directory for configuration files 
 │   ├── local/                        <- Directory for keeping environment variables and other local configurations that *do not sync** to Github 
 │   ├── logging/                      <- Configuration of python loggers
+│   ├── config.yaml                   <- Configuration of model parameters and variables in yaml file
 │   ├── flaskconfig.py                <- Configurations for Flask API 
 │
 ├── data                              <- Folder that contains data used or generated. Only the external/ and sample/ subdirectories are tracked by git. 
-│   ├── external/                     <- External data sources, usually reference data,  will be synced with git
-│   ├── sample/                       <- Sample data used for code development and testing, will be synced with git
+│   ├── model/                        <- Data used for model development and metric summaries of the model
+│   ├── raw/                          <- Raw data and processed data
 │
 ├── deliverables/                     <- Any white papers, presentations, final work products that are presented or delivered to a stakeholder 
-│
-├── docs/                             <- Sphinx documentation based on Python docstrings. Optional for this project.
 |
 ├── dockerfiles/                      <- Directory for all project-related Dockerfiles 
 │   ├── Dockerfile.app                <- Dockerfile for building image to run web app
-│   ├── Dockerfile.run                <- Dockerfile for building image to execute run.py  
-│   ├── Dockerfile.test               <- Dockerfile for building image to run unit tests
+│   ├── Dockerfile.pipline            <- Dockerfile for running model pipeline 
+│   ├── Dockerfile.run_rds            <- Dockerfile for building image to run rds
+│   ├── Dockerfile.run_s3             <- Dockerfile for building image to run s3
+│   ├── Dockerfile                    <- Dockerfile for building image to databases and model pipepline
+│   ├── Dockerfile.test               <- Dockerfile for building image to testing
 │
 ├── figures/                          <- Generated graphics and figures to be used in reporting, documentation, etc
 │
 ├── models/                           <- Trained model objects (TMOs), model predictions, and/or model summaries
 │
-├── notebooks/
-│   ├── archive/                      <- Develop notebooks no longer being used.
-│   ├── deliver/                      <- Notebooks shared with others / in final state
-│   ├── develop/                      <- Current notebooks being used in development.
-│   ├── template.ipynb                <- Template notebook for analysis with useful imports, helper functions, and SQLAlchemy setup. 
 │
 ├── reference/                        <- Any reference material relevant to the project
 │
-├── src/                              <- Source data for the project. No executable Python files should live in this folder.  
+├── src/                              <- Source data for the project.
 │
 ├── test/                             <- Files necessary for running model tests (see documentation below) 
 │
 ├── app.py                            <- Flask wrapper for running the web app 
-├── run.py                            <- Simplifies the execution of one or more of the src scripts  
-├── run.py                            <- Simplifies the execution of one or more of the src scripts  
+├── run_model.py                      <- Simplifies the execution of one or more of the src scripts  
+├── run_rds.py                        <- Simplifies the execution of one or more of the src scripts  
+├── run_s3.py                         <- Simplifies the execution of one or more of the src scripts  
+├── pipeline.sh                       <- sh file for running model pipeline 
 ├── requirements.txt                  <- Python package dependencies 
 ```
 
@@ -87,17 +77,17 @@ Note: For Windows operating system, you might need to add winpty before the Dock
 Build the Docker image for AWS_S3 (for raw data):
 
 ```bash
-docker build -t project -f dockerfiles/Dockerfile.run_s3 .    
+docker build -t project -f dockerfiles/Dockerfile .    
 ```
 
 Upload to s3
 ```bash
-docker run -e AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY project 
+docker run -e AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY project run_s3.py
 ```
 Download from s3
 
 ```bash
-docker run --mount type=bind,source="$(pwd)/data/raw/",target=/app/data/raw/ -e AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY project --download
+docker run --mount type=bind,source="$(pwd)/data/raw/",target=/app/data/raw/ -e AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY project run_s3.py --download
 ```
 
 ###2 Run model pipeline (process data + train & save model):
@@ -114,15 +104,16 @@ docker run --mount type=bind,source="$(pwd)",target=/app/ project pipeline.sh
 ###3 Create the AWS_RDS database (upload processed data/add employee)
 To Build the Docker image for creating database and adding records in RDS
 ```bash
-docker build -t project -f dockerfiles/Dockerfile.run_rds .
+docker build -t project -f dockerfiles/Dockerfile .
 ```
 Create the database in RDS
 ```bash
-docker run -it --env SQLALCHEMY_DATABASE_URI project create_db
+docker run -e SQLALCHEMY_DATABASE_URI project run_rds.py create_db
 ```
 Adding processed data
 ```bash
-docker run -it --env SQLALCHEMY_DATABASE_URI project ingest
+docker run -e SQLALCHEMY_DATABASE_URI project run_rds.py ingest
+
 ```
 
 

@@ -45,14 +45,14 @@ def transform_input(ui_dict: dict) -> pd.DataFrame:
 
 
 def prediction(input_df: pd.DataFrame, model_path='models/rf.joblib') -> [np.array, np.array]:
-    """Get loan delinquency prediction for new user input
+    """predcit attrition for new user input
     Args:
-        input_df (:obj:`DataFrame <pandas.DataFrame>`): a DataFrame of the transformed user input
+        input_df (pd.Dataframe): a DataFrame of transformed user input
         model_path (str): the path to trained model;
             default is 'models/randomforest.joblib' (config.yaml)
 
     Returns:
-        [pred_label, pred_prob] (:obj:`list`): the first object is a string indicating attrition
+        [pred_label, pred_prob] (list of np.Array): the first object is a string indicating attrition
         and the second is a number indicating the probability of attrition
     """
     # load pre-trained model
