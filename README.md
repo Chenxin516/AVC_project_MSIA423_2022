@@ -161,10 +161,9 @@ MAX_ROWS_SHOW = 100
 To build the image, run from this directory (the root of the repo): 
 
 ```bash
- docker build -f dockerfiles/Dockerfile.app -t pennylaneapp .
+ docker build -f dockerfiles/Dockerfile.app -t project .
 ```
 
-This command builds the Docker image, with the tag `pennylaneapp`, based on the instructions in `dockerfiles/Dockerfile.app` and the files existing in this directory.
 
 #### Running the app
 
@@ -189,7 +188,7 @@ Note: If `PORT` in `config/flaskconfig.py` is changed, this port should be chang
 
 Once finished with the app, you will need to kill the container. 
 
-First run "ctrl"+"\" and "ctrl"+"Z" to stop the process. If you named the container, you can execute the following: 
+First run "ctrl"+"Z" to stop the process. If you named the container, you can execute the following: 
 
 ```bash
 docker kill test-app
