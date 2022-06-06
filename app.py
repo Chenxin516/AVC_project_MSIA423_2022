@@ -1,9 +1,11 @@
+"""Running the Flask app"""
 import logging.config
 import traceback
 import yaml
+import pandas as pd
 from flask import Flask, render_template, request
 from config.flaskconfig import MaritalStatus, Gender, OverTime
-import pandas as pd
+
 
 # For setting up the Flask-SQLAlchemy database session
 from src.employee_db import EmployeeManager
@@ -62,77 +64,78 @@ def add_entry():
     """
     if request.method == 'GET':
         return "Visit the homepage to add applicants and get predictions"
-    elif request.method == 'POST':
-        df = pd.read_csv('data/raw/employee_results.csv')
-        number = max(df['EmployeeNumber']) + 1
+
+    df = pd.read_csv('data/raw/employee_results.csv')
+    number = max(df['EmployeeNumber']) + 1
+
+    try:
+        logger.info(
+            "New applicant of Employee ID %s added",
+            number
+        )
+
+        # Get loan delinquency prediction for the new applicant
+        user_input = {'EmployeeNumber': number,
+                      'EnvironmentSatisfaction': int(request.form['EnvironmentSatisfaction']),
+                      'JobInvolvement': int(request.form['JobInvolvement']),
+                      'JobLevel': int(request.form['JobLevel']),
+                      'JobSatisfaction': int(request.form['JobSatisfaction']),
+                      'PerformanceRating': int(request.form['PerformanceRating']),
+                      'RelationshipSatisfaction': int(request.form['RelationshipSatisfaction']),
+                      'WorkLifeBalance': int(request.form['WorkLifeBalance']),
+                      'YearsSinceLastPromotion': int(request.form['YearsSinceLastPromotion']),
+                      'MaritalStatus': request.form['MaritalStatus'],
+                      'Gender': request.form['Gender'],
+                      'OverTime': request.form['OverTime']}
+
+        # get transformed input and prediction
+        user_input_new = transform_input(user_input)
+        label = prediction(user_input_new)[0]
+        prob = prediction(user_input_new)[1]
+
+        logger.info(
+            "The employee's probability of attrition is: %f, "
+            "hence %s", prob, label
+        )
+
+        if label == "the employee is not likely to leave":
+            attr = 'No'
+        else:
+            attr = 'Yes'
+
         try:
-            logger.info(
-                "New applicant of Employee ID %s added",
-                number
+            # Add new applicant information to RDS for future usages
+            employee_manager.add_employee(
+                EmployeeNumber=number,
+                EnvironmentSatisfaction=int(request.form['EnvironmentSatisfaction']),
+                JobInvolvement=int(request.form['JobInvolvement']),
+                JobLevel=int(request.form['JobLevel']),
+                JobSatisfaction=int(request.form['JobSatisfaction']),
+                PerformanceRating=int(request.form['PerformanceRating']),
+                RelationshipSatisfaction=int(request.form['RelationshipSatisfaction']),
+                WorkLifeBalance=int(request.form['WorkLifeBalance']),
+                YearsSinceLastPromotion=int(request.form['YearsSinceLastPromotion']),
+                MaritalStatus=request.form['MaritalStatus'],
+                Gender=request.form['Gender'],
+                OverTime=request.form['OverTime'],
+                Attrition=attr
             )
-
-            # Get loan delinquency prediction for the new applicant
-            user_input = {'EmployeeNumber': number,
-                          'EnvironmentSatisfaction': int(request.form['EnvironmentSatisfaction']),
-                          'JobInvolvement': int(request.form['JobInvolvement']),
-                          'JobLevel': int(request.form['JobLevel']),
-                          'JobSatisfaction': int(request.form['JobSatisfaction']),
-                          'PerformanceRating': int(request.form['PerformanceRating']),
-                          'RelationshipSatisfaction': int(request.form['RelationshipSatisfaction']),
-                          'WorkLifeBalance': int(request.form['WorkLifeBalance']),
-                          'YearsSinceLastPromotion': int(request.form['YearsSinceLastPromotion']),
-                          'MaritalStatus': request.form['MaritalStatus'],
-                          'Gender': request.form['Gender'],
-                          'OverTime': request.form['OverTime']}
-
-            # get transformed input and prediction
-            user_input_new = transform_input(user_input)
-            label = prediction(user_input_new)[0]
-            prob = prediction(user_input_new)[1]
-
-            logger.info(
-                "The employee's probability of attrition is: %f, "
-                "hence %s", prob, label
-            )
-
-            if label == "the employee is not likely to leave":
-                attr = 'No'
-            else:
-                attr = 'Yes'
-
-            try:
-                # Add new applicant information to RDS for future usages
-                employee_manager.add_employee(
-                    EmployeeNumber=number,
-                    EnvironmentSatisfaction=int(request.form['EnvironmentSatisfaction']),
-                    JobInvolvement=int(request.form['JobInvolvement']),
-                    JobLevel=int(request.form['JobLevel']),
-                    JobSatisfaction=int(request.form['JobSatisfaction']),
-                    PerformanceRating=int(request.form['PerformanceRating']),
-                    RelationshipSatisfaction=int(request.form['RelationshipSatisfaction']),
-                    WorkLifeBalance=int(request.form['WorkLifeBalance']),
-                    YearsSinceLastPromotion=int(request.form['YearsSinceLastPromotion']),
-                    MaritalStatus=request.form['MaritalStatus'],
-                    Gender=request.form['Gender'],
-                    OverTime=request.form['OverTime'],
-                    Attrition=attr
-                )
-                logger.info('New Employee added to the database')
-            except ConnectionError:
-                logger.error('Cannot add employee added to the database, check your database connection')
-            except:
-                logger.error('Cannot add employee added to the database, the employee might already exist in the '
-                             'database')
-
-            df_new = df.append(user_input, ignore_index=True)
-            df_new.to_csv('data/raw/employee_results.csv', index=False)
-            logger.info('New Employee added to the local file')
-
-            logger.debug("Result page accessed")
-            return render_template('result.html', prob=prob, label=label)
+            logger.info('New Employee added to the database')
+        except ConnectionError:
+            logger.error('Cannot add employee added to the database, check your database connection')
         except:
-            logger.warning("Not able to process your request, error page returned")
-            return render_template('error.html')
+            logger.error('Cannot add employee added to the database, the employee might already exist in the '
+                         'database')
+
+        df_new = df.append(user_input, ignore_index=True)
+        df_new.to_csv('data/raw/employee_results.csv', index=False)
+        logger.info('New Employee added to the local file')
+
+        logger.debug("Result page accessed")
+        return render_template('result.html', prob=prob, label=label)
+    except RuntimeError:
+        logger.warning("Not able to process your request, error page returned")
+        return render_template('error.html')
 
 
 @app.route('/about', methods=['GET'])

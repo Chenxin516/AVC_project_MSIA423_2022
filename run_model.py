@@ -1,3 +1,4 @@
+"""Model pipeline for the project"""
 import argparse
 import logging
 
@@ -12,6 +13,7 @@ logging.basicConfig(format='%(name)-12s %(levelname)-8s %(message)s', level=logg
 logger = logging.getLogger('AVC-project-modelling')
 
 if __name__ == '__main__':
+    #run model pipeline
     parser = argparse.ArgumentParser(description="Model pipeline for project")
 
     subparsers = parser.add_subparsers(dest='subparser_name')

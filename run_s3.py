@@ -1,3 +1,4 @@
+"""Download and upload data from S3."""
 import argparse
 import logging.config
 import yaml

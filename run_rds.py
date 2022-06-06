@@ -1,17 +1,16 @@
-"""Creates and ingests data into a table of songs for the PennyLane."""
+"""Creates and ingests data into a table of employees."""
 import os
 import logging.config
-from sqlalchemy.ext.declarative import declarative_base
-from src.employee_db import create_db, EmployeeManager, Employee
-from sqlalchemy.exc import ProgrammingError, OperationalError
 import argparse
 import yaml
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.exc import ProgrammingError, OperationalError
+from src.employee_db import create_db, EmployeeManager
 
-#define engine string
+# define engine string
 engine_string = os.getenv("SQLALCHEMY_DATABASE_URI")
 if engine_string is None:
     raise RuntimeError("SQLALCHEMY_DATABASE_URI environment variable not set; exiting")
-
 
 # set up logging config
 logging.basicConfig(format="%(levelname)s:%(message)s", level=logging.DEBUG)
@@ -59,9 +58,3 @@ if __name__ == "__main__":
         employee.add_result(args.input_path)
         logger.info("the result data has been ingested")
         employee.close()
-
-
-
-
-
-
