@@ -81,7 +81,7 @@ def split_data(df_model: pd.DataFrame, test_size: float, random_state: int) \
 
 
 def train_model(X_train: pd.DataFrame, y_train: pd.Series, max_depth: int,
-                n_estimators: int) -> RandomForestClassifier:
+                n_estimators: int, random_state: int) -> RandomForestClassifier:
     """
     train and save classifier model
     Args:
@@ -89,13 +89,15 @@ def train_model(X_train: pd.DataFrame, y_train: pd.Series, max_depth: int,
         y_train(pd.Series): y variables of test data
         n_estimators (int): number of trees in the forest
         max_depth (int): maximum depth of trees
+        random_state (int): random state
     Returns:
         final_rf(sklearn.RandomForestClassifier): trained random forest model
     """
 
     final_rf = RandomForestClassifier(bootstrap=False,
                                       max_depth=max_depth,
-                                      n_estimators=n_estimators)
+                                      n_estimators=n_estimators,
+                                      random_state=random_state)
     final_rf.fit(X_train, y_train)
 
     logger.info("Classifier model trained")
